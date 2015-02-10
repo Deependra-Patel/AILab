@@ -49,19 +49,31 @@ node* node::contraPositive(){
     node * left = new node();
     node * right = new node();
     
-    if (!node2->leaf && node2->node2->id ==  'F'){
-	left = node2->node1;
+    if(node2->leaf && node2->id == 'F' && !node1->leaf && node1->node2->leaf && node1->node2->id == 'F'){
+      left = node1->node1->node1;
+      right = node1->node1->node2;
     }
-    else{
+    
+    else if(this->leaf && this->id != 'F'){
+      left->node1 = this;
+      left->node2 = f1;
+      right = f2;
+    }
+    else {
+      if (!node2->leaf && node2->node2->id ==  'F'){
+	left = node2->node1;
+      }
+      else{
 	left->node1 = this->node2;
 	left->node2 = f1;
-    }
-    if (!node1->leaf && node1->node2->id ==  'F'){
+      }
+      if (!node1->leaf && node1->node2->id ==  'F'){
 	right = node1->node1;
-    }
-    else{
+      }
+      else{
 	right->node1 = this->node1;
 	right->node2 = f2;
+      }
     }
     top->node1 = left;
     top->node2 = right;
@@ -227,7 +239,7 @@ bool bfs(){
 	myqueue.push(literals[i]);
     }
 
-    int threshold = 20;
+    int threshold = 3000;
     while(!myqueue.empty() && threshold){
 	//cout<<threshold<<endl;
 	node* curNode = myqueue.front();
