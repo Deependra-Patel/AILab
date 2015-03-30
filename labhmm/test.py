@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from train import getPhonemesFromWord, generateTables
+from train import getPhonemesFromInputList, generateTables, graphemeTophoneme
 generateTables()
 f = open("testData.txt", 'r')
 
@@ -15,11 +15,20 @@ failed = 0
 for line in f:
     line = line.rstrip()
     tokens = line.split(" ")
-    phonemes = getPhonemesFromWord(tokens[0])
-    matched =  matchList(phonemes, tokens[1:])
+    if graphemeTophoneme is True:
+        expectedOutput = tokens[1:]
+        inputList = [char for char in tokens[0]]
+    else:
+        expectedOutput = [char for char in tokens[0]]
+        inputList = tokens[1:]
+    outputList = getPhonemesFromInputList(inputList)
+    matched =  matchList(outputList, expectedOutput)
     passed += matched
     failed += len(tokens[1:]) - matched
-    print line + " " + " ".join(phonemes) #str(passed) + str(failed)
+    if graphemeTophoneme is True:
+        print line + " Ouput:- " + " ".join(outputList) 
+    else:
+        print line + " Ouput:- " + "".join(outputList)
 
 print "Passed: "+str(passed)
 print "Failed: "+str(failed)

@@ -1,7 +1,12 @@
 #!/usr/bin/python2.7
-fStates = open("states.txt", 'r')
+graphemeTophoneme = True
+
 fTrain = open("trainData.txt", 'r')
-states = fStates.readlines()
+fStates = open("states.txt", 'r')
+if not graphemeTophoneme:
+    fStates = open("states2.txt", 'r')
+    
+states = fStates.readlines()    
 states.insert(0, "^")
 
 states = [state.strip() for state in states]
@@ -24,8 +29,14 @@ def init_freq():
 def fillFrequency():
     for line in lines:
         tokens = line.split(" ")
-        graphemes = [char for char in tokens[0]]
-        phonemes = tokens[1:]
+        graphemes = []
+        phonemes = []
+        if graphemeTophoneme:
+            graphemes = [char for char in tokens[0]]
+            phonemes = tokens[1:]
+        else :
+            phonemes = [char for char in tokens[0]]
+            graphemes = tokens[1:]          
         if len(phonemes) != len(graphemes):
             print "Len(phoneme)!=Len(Grapheme)\n"
             continue
@@ -35,11 +46,10 @@ def fillFrequency():
                     transitionFreq["^"][phonemes[i]] += 1
                 else :
                     transitionFreq[phonemes[i-1]][phonemes[i]] += 1
-                    
-            if graphemes[i] in lexicalFreq[phonemes[i]]:
-                lexicalFreq[phonemes[i]][graphemes[i]]+=1
-            else :
-                lexicalFreq[phonemes[i]][graphemes[i]] = 1
+                if graphemes[i] in lexicalFreq[phonemes[i]]:
+                    lexicalFreq[phonemes[i]][graphemes[i]]+=1
+                else :
+                    lexicalFreq[phonemes[i]][graphemes[i]] = 1
 
 def getTransitionProb(transitionFreq):
     transitionProb = {}
@@ -76,12 +86,13 @@ def generateTables():
     fillFrequency()
     transitionProb =  getTransitionProb(transitionFreq)
     lexicalProb = getLexicalProb(lexicalFreq)
-   
-#print "TRANSITION Prob"
-#print transitionProb
+    print "TRANSITION Freq"
+    print transitionFreq
 
-#print "LEXICAL Prob"
-#print lexicalProb
+    print "LEXICAL Freq"
+    print lexicalFreq
+
+   
 
 def getTranistionProbState(state1, state2):
     return transitionProb[state1][state2]
@@ -132,7 +143,7 @@ def getPhonemes(graphemes):
             maxi = maxProb[state]
             finalState = state
     return phonemesFromParent(parent, graphemes, finalState)
-def getPhonemesFromWord(word):
-    graphemes = [char for char in word]
-    phonemes = getPhonemes(graphemes)
+def getPhonemesFromInputList(inputList):
+    # graphemes = [char for char in word]
+    phonemes = getPhonemes(inputList)
     return phonemes
