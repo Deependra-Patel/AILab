@@ -7,7 +7,7 @@ numLines = int(process.communicate()[0].split(' ')[0])
 fData = open("data.txt",'r')
 fTest = open("testData.txt", 'w+')
 fTrain = open("trainData.txt", 'w+')
-forTrain = sample(range(0,numLines), int(0.94*numLines))
+forTrain = sample(range(0,numLines), int(0.80*numLines))
 lines = fData.readlines()
 for x in forTrain:
     fTrain.write(lines[x])

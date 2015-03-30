@@ -4,12 +4,11 @@ generateTables()
 f = open("testData.txt", 'r')
 
 def matchList(list1, list2):
-    if len(list1)!= len(list2):
-        return False
-    for i in range(len(list1)):
-        if list1[i]!=list2[i]:
-            return False
-    return True
+	matched = 0
+	for i in range(len(list1)):
+		if list1[i]==list2[i]:
+			matched += 1
+	return matched
     
 passed = 0
 failed = 0
@@ -17,12 +16,10 @@ for line in f:
     line = line.rstrip()
     tokens = line.split(" ")
     phonemes = getPhonemesFromWord(tokens[0])
-    if matchList(phonemes, tokens[1:]):
-        passed += 1
-    else :
-        failed += 1
-        print "-----"
-    print line + " ".join(phonemes)
+    matched =  matchList(phonemes, tokens[1:])
+    passed += matched
+    failed += len(tokens[1:]) - matched
+    print line + " " + " ".join(phonemes) #str(passed) + str(failed)
 
 print "Passed: "+str(passed)
 print "Failed: "+str(failed)
