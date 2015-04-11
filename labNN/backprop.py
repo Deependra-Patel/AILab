@@ -1,8 +1,11 @@
 #!/usr/bin/python
 import random
 import math
+import sys
+from bits import *
 def sigmoid_func(w):
     return 1.0 / (1.0 + math.exp(-w))
+debug = False
 
 class Node:
     def __init__(self):
@@ -26,6 +29,10 @@ class Node:
         for edge in self.in_edges:
             val = edge.source.getOutput(inp)
             self.inp.append(val)
+            global debug
+            if debug:
+                print "ehllo"
+                print val, edge.weight
             w += edge.weight * val
             
         self.out = sigmoid_func(w)
@@ -152,49 +159,88 @@ class Network:
 
     def train_model(self, examples, param, max_itr):
         while max_itr > 0:
+            i = 0
             for example, label in examples:
+                print i
+                i += 1
                 self.getOutput(example)
                 self.findError(label)
                 self.updateWeights(param)
             max_itr -= 1
 
-
-
+network = Network()    
 gNode = 0
-print "Estimating the XOR function :- "
-network = Network()
+MAX = 0
+def initNetwork():
+    global MAX
+    MAX = initBits()
+    output_nodes = []
+    input_nodes = []
+    numInput = MAX*bitsG
+    numOutput = MAX*bitsP
+    numHidden = (numInput+numOutput)/30
+    print bitsG, MAX, numInput, numHidden
+    for i in range(numInput):
+        input_nodes.append(InputNode(i))
 
-output_nodes = []
-input_nodes = []
-for i in range(2):
-    input_nodes.append(InputNode(i))
-
-for i in range(2):
-    output_nodes.append(Node())
-    output_nodes[i].setIndex(i)
+    for i in range(numOutput):
+        output_nodes.append(Node())
+        output_nodes[i].setIndex(i)
     
-hidden_nodes = []
-for i in range(2):
-    hidden_nodes.append(Node())
+    hidden_nodes = []
+    for i in range(numHidden):
+        hidden_nodes.append(Node())
 
-for src in input_nodes:
-    for dst in hidden_nodes:
-        Edge(src, dst)
+    for src in input_nodes:
+        for dst in hidden_nodes:
+            Edge(src, dst)
 
-for src in hidden_nodes:
-    for dst in output_nodes:
-        Edge(src, dst)
-print "dfd"
-network.out_nodes = output_nodes
-network.in_nodes = input_nodes
-
+    for src in hidden_nodes:
+        for dst in output_nodes:
+            Edge(src, dst)
+    network.out_nodes = output_nodes
+    network.in_nodes = input_nodes
+    
 examples = [((0, 0), (0,1)),
             ((0, 1), (0,1)),
             ((1, 0), (0,1)),
             ((1, 1), (0,1))]
+def trainNetwork():
+    f = open("trainData.txt", 'r')
+    trainData = []
+    for line in f:
+        line = (line.strip()).split()
+        graphemes = [c for c in line[0]]
+        phonemes = line[1:]
+        grBits = tuple(graphemeToBits(graphemes))
+        phBits = tuple(phonemeToBits(phonemes))
+        grBits = grBits + tuple([float(c) for c in '0'*(MAX*bitsG - len(grBits))])
+        phBits = phBits + tuple([float(c) for c in '0'*(MAX*bitsP - len(phBits))])
+       # print grBits
+       # print MAX*bitsG, bitsG
+        if len(phBits)!=196:
+            print len(phBits),"dfsd", phBits
+            sys.exit(0)
+            break
+        trainData.append(tuple([grBits, phBits]))
+    network.train_model(trainData, 0.80, 2)
 
-network.train_model(examples, 0.80, 1000)
-
-for example, label in examples:
-    print "Test = %r, Output = %r, label  = %r" % (example, network.getOutput(example), label)
+def testNetwork():
+    d = "AAAAAAA"*4
+    inp = tuple(graphemeToBits([c for c in d]))
+    #print inp
+    output = (d, network.getOutput(inp))
+    #print output
+    print bitsToPhonemes(output[1], 28)
+   # print "Test = %r, Output = %r" % output
         
+def main():
+    initNetwork()
+    trainNetwork()
+    #network.printInfo()
+    global debug
+    debug = False
+    print "dfasd"
+    testNetwork()
+if __name__ == "__main__":
+    main()
