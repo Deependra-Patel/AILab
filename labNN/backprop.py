@@ -1,6 +1,6 @@
+#!/usr/bin/python
 import random
 import math
-
 def sigmoid_func(w):
     return 1.0 / (1.0 + math.exp(-w))
 
@@ -15,7 +15,8 @@ class Node:
         self.in_edges = []
         self.out_edges = []
         self.addDummyNode()
-
+        self.index = 0
+        
     def getOutput(self, inp):
         if self.out is not None:
             return self.out
@@ -35,7 +36,7 @@ class Node:
             return self.err
             
         if self.out_edges == []:
-            self.err =  label - self.out
+            self.err =  label[self.index] - self.out
         else:
             val = 0.0
             for edge in self.out_edges:
@@ -72,8 +73,8 @@ class Node:
         for edge in self.in_edges:
             edge.printInfo()
         
-        
-        
+    def setIndex(self, x):
+        self.index = x
 
 class Edge:
     def __init__(self, source, dest):
@@ -155,7 +156,6 @@ class Network:
                 self.getOutput(example)
                 self.findError(label)
                 self.updateWeights(param)
-                
             max_itr -= 1
 
 
@@ -171,6 +171,7 @@ for i in range(2):
 
 for i in range(2):
     output_nodes.append(Node())
+    output_nodes[i].setIndex(i)
     
 hidden_nodes = []
 for i in range(2):
@@ -183,17 +184,17 @@ for src in input_nodes:
 for src in hidden_nodes:
     for dst in output_nodes:
         Edge(src, dst)
-
+print "dfd"
 network.out_nodes = output_nodes
 network.in_nodes = input_nodes
 
-examples = [((0, 0), 0),
-            ((0, 1), 0),
-            ((1, 0), 0),
-            ((1, 1), 1)]
+examples = [((0, 0), (0,1)),
+            ((0, 1), (0,1)),
+            ((1, 0), (0,1)),
+            ((1, 1), (0,1))]
 
-network.train_model(examples, 0.99, 5000)
+network.train_model(examples, 0.80, 1000)
 
 for example, label in examples:
-    print "Test = %r, Output = %0.2f, Error  = %0.2f" % (example, network.getOutput(example), label - network.getOutput(example))
+    print "Test = %r, Output = %r, label  = %r" % (example, network.getOutput(example), label)
         
