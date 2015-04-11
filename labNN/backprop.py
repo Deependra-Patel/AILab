@@ -126,11 +126,13 @@ class TrueNode(Node):
 class Network:
     def __init__(self):
         self.in_nodes = []
-        self.out_node = None
+        self.out_nodes = []
 
     def getOutput(self, inp):
-        self.out_node.flushOutput()
-        output = self.out_node.getOutput(inp)
+        output = []
+        for node in self.out_nodes:
+            node.flushOutput()
+            output.append(node.getOutput(inp))
         return output
         
     def updateWeights(self, param):
@@ -143,7 +145,8 @@ class Network:
 
     def printInfo(self):
         print "-------- Print Info Begins--------"
-        self.out_node.printInfo()
+        for node in self.out_nodes:
+            node.printInfo()
         print "-------- Print Info Ends --------"
 
     def train_model(self, examples, param, max_itr):
@@ -161,11 +164,14 @@ gNode = 0
 print "Estimating the XOR function :- "
 network = Network()
 
-output_node = Node()
+output_nodes = []
 input_nodes = []
 for i in range(2):
     input_nodes.append(InputNode(i))
 
+for i in range(2):
+    output_nodes.append(Node())
+    
 hidden_nodes = []
 for i in range(2):
     hidden_nodes.append(Node())
@@ -175,9 +181,10 @@ for src in input_nodes:
         Edge(src, dst)
 
 for src in hidden_nodes:
-    Edge(src, output_node)
+    for dst in output_nodes:
+        Edge(src, dst)
 
-network.out_node = output_node
+network.out_nodes = output_nodes
 network.in_nodes = input_nodes
 
 examples = [((0, 0), 0),
