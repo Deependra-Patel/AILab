@@ -77,7 +77,7 @@ def bitsToPhonemes(bits,length):
             app = []
         i += 1
         app.append(bit)
-    print ans
+#    print ans
     return ans[:length]
     
 def main():
