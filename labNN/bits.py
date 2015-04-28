@@ -34,7 +34,7 @@ def initBits():
         st = "0"*(bitsP-len(st))+st
         phoneM[line] = [float(c) for c in st]
 
-    f = open("data.txt", 'r')
+    f = open("newData.txt", 'r')
     for line in f:
         gr = len(line.split())-1
         if MAX < gr:
@@ -55,7 +55,7 @@ def phonemeToBits(phoneme):
     return st
 
 def bitsToPhonemes(bits,length):
-    i = 1
+    i = 0
     app = []
     ans = []
     bits = list(bits)
@@ -65,10 +65,11 @@ def bitsToPhonemes(bits,length):
             bits[j] = '1'
         else:
             bits[j] = '0'
-        
+    print bits, len(bits)
     for bit in bits:
-        if i%bitsP == 0:
+        if i%bitsP == 0 and i != 0:
             index = int(''.join(app), 2)
+            print "INDEX: ", index, ''.join(app)
             for key in phoneM:
                 index2 = int(''.join([str(int(c)) for c in phoneM[key]]), 2)
                 if(index2 == index):
@@ -77,12 +78,19 @@ def bitsToPhonemes(bits,length):
             app = []
         i += 1
         app.append(bit)
+    index = int(''.join(app), 2)
+    print "INDEX: ", index, ''.join(app)
+    for key in phoneM:
+        index2 = int(''.join([str(int(c)) for c in phoneM[key]]), 2)
+        if(index2 == index):
+            ans.append(key)
+            break
 #    print ans
     return ans[:length]
     
 def main():
     initBits()
-    print phonemeToBits("AA AE1".split())
+    print phonemeToBits("K AE2 F EY1 Z".split())
 
 
 if __name__ == "__main__":

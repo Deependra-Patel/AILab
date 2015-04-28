@@ -161,7 +161,7 @@ class Network:
         while max_itr > 0:
             i = 0
             for example, label in examples:
-                print i
+                #print i
                 i += 1
                 self.getOutput(example)
                 self.findError(label)
@@ -200,11 +200,38 @@ def initNetwork():
             Edge(src, dst)
     network.out_nodes = output_nodes
     network.in_nodes = input_nodes
+    """
+    output_nodes = []
+    input_nodes = []
+    numInput = 4
+    numOutput = 4
+    numHidden = 4
+    for i in range(numInput):
+        input_nodes.append(InputNode(i))
+
+    for i in range(numOutput):
+        output_nodes.append(Node())
+        output_nodes[i].setIndex(i)
     
-examples = [((0, 0), (0,1)),
-            ((0, 1), (0,1)),
-            ((1, 0), (0,1)),
-            ((1, 1), (0,1))]
+    hidden_nodes = []
+    for i in range(numHidden):
+        hidden_nodes.append(Node())
+
+    for src in input_nodes:
+        for dst in hidden_nodes:
+            Edge(src, dst)
+
+    for src in hidden_nodes:
+        for dst in output_nodes:
+            Edge(src, dst)
+    network.out_nodes = output_nodes
+    network.in_nodes = input_nodes
+    """
+    
+examples = [((0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), (0,0,0,0)),
+            ((0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), (0,0,0,0)),
+            ((1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), (0,0,0,0)),
+            ((1, 1, 0 ,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), (1,0,0,0))]
 def trainNetwork():
     f = open("trainData.txt", 'r')
     trainData = []
@@ -218,21 +245,32 @@ def trainNetwork():
         phBits = phBits + tuple([float(c) for c in '0'*(MAX*bitsP - len(phBits))])
        # print grBits
        # print MAX*bitsG, bitsG
-        if len(phBits)!=196:
+        if len(phBits)!=MAX*bitsP:
             print len(phBits),"dfsd", phBits
             sys.exit(0)
             break
         trainData.append(tuple([grBits, phBits]))
-    network.train_model(trainData, 0.80, 2)
+    
+    network.train_model(trainData, 0.80, 500)
 
 def testNetwork():
-    d = "AAAAAAA"*4
-    inp = tuple(graphemeToBits([c for c in d]))
-    #print inp
-    output = (d, network.getOutput(inp))
-    #print output
-    print bitsToPhonemes(output[1], 28)
+    tFile = open('testData.txt', 'r')
+    testLines = tFile.readlines()
+    testLines = testLines[0:15]
+    for line in testLines:
+        d = line.split()[0]
+        inp = graphemeToBits([c for c in d])
+        for i in range(0, bitsG*MAX - len(inp)):
+            inp.append(0.0)
+        #print inp
+        inp = tuple(inp)
+        output = (d, network.getOutput(inp))
+        #print output
+        print bitsToPhonemes(output[1], (len(d.split())-1)*bitsP), "ACTUAL: ", line.split()[1:]
    # print "Test = %r, Output = %r" % output
+   
+    #output = ("rand", network.getOutput((1,1,0,0)))
+    #print output[1]
         
 def main():
     initNetwork()
