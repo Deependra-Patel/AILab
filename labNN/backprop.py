@@ -256,7 +256,8 @@ def trainNetwork():
 def testNetwork():
     tFile = open('testData.txt', 'r')
     testLines = tFile.readlines()
-    testLines = testLines[0:15]
+    testLines = testLines[0:1500]
+    outFile = open('output.txt', 'w')
     for line in testLines:
         d = line.split()[0]
         inp = graphemeToBits([c for c in d])
@@ -266,7 +267,10 @@ def testNetwork():
         inp = tuple(inp)
         output = (d, network.getOutput(inp))
         #print output
-        print bitsToPhonemes(output[1], (len(d.split())-1)*bitsP), "ACTUAL: ", line.split()[1:]
+        #print bitsP
+        print bitsToPhonemes(output[1], len(line.split())-1), "ACTUAL: ", line.split()[1:]
+        outFile.write(str(bitsToPhonemes(output[1], len(line.split())-1)))
+        outFile.write(" " + str(line.split()[1:]) + "\n")
    # print "Test = %r, Output = %r" % output
    
     #output = ("rand", network.getOutput((1,1,0,0)))

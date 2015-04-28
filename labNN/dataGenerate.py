@@ -18,9 +18,10 @@ numLines = int(process.communicate()[0].split(' ')[0])
 
 fTest = open("testData.txt", 'w+')
 fTrain = open("trainData.txt", 'w+')
-forTrain = sample(range(0,numLines), int(0.01*numLines))
+forTrain = sample(range(0,numLines), int(0.1*numLines))
+forTest = sample(range(0,numLines), numLines)
 lines = nData.readlines()
-forTrain = range(0,100)
+forTrain = range(0,1000)
 #shuffle(lines)
 def is_ascii(s):
     return all(ord(c) < 128 for c in s)
@@ -28,7 +29,7 @@ for x in forTrain:
     if (is_ascii(lines[x])):
         if len(lines[x].split()) <= 6:
             fTrain.write(lines[x])
-for i in range(numLines):
+for i in forTest:
     if i in forTrain:
         continue
     elif (is_ascii(lines[i])) and len(lines[i].split()) <= 6:
